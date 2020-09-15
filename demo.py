@@ -8,18 +8,18 @@ import numpy as np
 from model import create_model
 
 if __name__ == '__main__':
-    img_rows, img_cols = 320, 320
+    img_rows, img_cols = 256, 256
     channel = 4
 
-    model_weights_path = 'models/model.107-0.0197.hdf5'
-    model = create_model()
+    # model_weights_path = 'models/model.107-0.0197.hdf5'
+    # model = create_model()
+    #
+    # model.load_weights(model_weights_path)
+    # print(model.summary())
 
-    model.load_weights(model_weights_path)
-    print(model.summary())
-
-    test_path = 'data/test/'
+    test_path = "/infodev1/non-phi-data/junjiang/OvaryCancer/auto_enc_patches_256/OCMC-016"
     test_images = [f for f in os.listdir(test_path) if
-                   os.path.isfile(os.path.join(test_path, f)) and f.endswith('.jpg')]
+                   os.path.isfile(os.path.join(test_path, f)) and f.endswith('.jpg') and "144" in f]
 
     samples = random.sample(test_images, 10)
 

@@ -4,7 +4,7 @@ from keras.utils import plot_model
 
 
 if __name__ == '__main__':
-    img_rows, img_cols = 320, 320
+    img_rows, img_cols = 256, 256
     channel = 3
     model = autoencoder(img_rows, img_cols, channel)
     plot_model(model, to_file='model.svg', show_layer_names=True, show_shapes=True)

@@ -110,7 +110,7 @@ def process_data(usage):
 
 if __name__ == '__main__':
     # parameters
-    img_width, img_height = 320, 320
+    img_width, img_height = 256, 256
 
     print('Extracting cars_train.tgz...')
     if not os.path.exists('cars_train'):

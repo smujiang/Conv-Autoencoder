@@ -4,7 +4,7 @@ from keras.optimizers import SGD
 
 import migrate
 from model import create_model
-from utils import load_data, custom_loss
+from utils import load_data, load_wsi_patches, custom_loss
 
 if __name__ == '__main__':
     batch_size = 16
@@ -21,7 +21,8 @@ if __name__ == '__main__':
     print(model.summary())
 
     # Load our data
-    x_train, y_train, x_valid, y_valid = load_data()
+    patch_dir = "/infodev1/non-phi-data/junjiang/OvaryCancer/auto_enc_patches_256/OCMC-016"
+    x_train, y_train, x_valid, y_valid = load_wsi_patches(patch_dir)
 
     # Callbacks
     tensor_board = keras.callbacks.TensorBoard(log_dir='./logs', histogram_freq=0, write_graph=True, write_images=True)
