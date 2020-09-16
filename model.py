@@ -60,7 +60,7 @@ def create_model():
     x = MaxPooling2D((2, 2), strides=(2, 2))(x)  #4， 4， 512
 
     # Decoder
-    # x = Conv2D(512, (4, 4), activation='relu', padding='valid', name='conv6')(x) # 4, 4， 512
+    # x = Conv2D(512, (4, 4), activation='relu', padding='valid', name='code')(x) # 1, 1， 512
     # CODE = x
     # x = BatchNormalization()(x)
     # x = UpSampling2D(size=(4, 4))(x) # 4, 4, 512
