@@ -113,9 +113,10 @@ def create_model():
 
 
 if __name__ == '__main__':
-    model = create_model(224, 224, 3)
+    # model = create_model(224, 224, 3)
+    model = create_model()
     # input_layer = model.get_layer('input')
     print(model.summary())
-    plot_model(model, to_file='model.svg', show_layer_names=True, show_shapes=True)
+    # plot_model(model, to_file='model.png', show_layer_names=True, show_shapes=True)
 
     K.clear_session()

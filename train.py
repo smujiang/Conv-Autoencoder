@@ -19,7 +19,6 @@ if __name__ == '__main__':
     model.compile(optimizer=sgd, loss=custom_loss)
 
     print(model.summary())
-
     # Load our data
     patch_dir = "/infodev1/non-phi-data/junjiang/OvaryCancer/auto_enc_patches_256/OCMC-016"
     x_train, y_train, x_valid, y_valid = load_wsi_patches(patch_dir)
