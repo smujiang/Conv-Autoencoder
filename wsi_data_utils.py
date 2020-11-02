@@ -3,6 +3,7 @@ import glob
 import numpy as np
 from PIL import Image
 from itertools import cycle
+import random
 #
 def save_all_img_names_and_labels(save_to, data_root, case_list, class_maps, ext=".jpg"):
     '''
@@ -16,10 +17,10 @@ def save_all_img_names_and_labels(save_to, data_root, case_list, class_maps, ext
     :param ext: extension of the image file name
     :return:
     '''
-    wrt_str = ""
     if not os.path.exists(save_to):
         fp = open(save_to, 'a')
         for case in case_list:
+            wrt_str = ""
             f_list = glob.glob(os.path.join(data_root, case, "*"+ext))
             label = "0"
             for key, value in class_maps.items():
@@ -32,6 +33,44 @@ def save_all_img_names_and_labels(save_to, data_root, case_list, class_maps, ext
         fp.close()
     else:
         print("file has already exists")
+
+
+#
+def save_random_img_names_and_labels_per_case(save_to, data_root, case_list, class_maps, random_sample=0.1, ext=".jpg"):
+    '''
+    List all the name of image patches from cases which are listed in case_list
+    list all the class labels for the images
+    then save them to a txt file, format: each row is an example, consists of label and image file path
+    :param save_to:  file name where the data will save to
+    :param data_root: root dir to the image files
+    :param case_list:  example, case_list = ["OCMC-016", "OCMC-017", "OCMC-001", "OCMC-002"]
+    :param class_maps: example, class_maps = {0: ["OCMC-016", "OCMC-017"], 1: ["OCMC-001", "OCMC-002"]}
+    :param ext: extension of the image file name
+    :return:
+    '''
+    if not os.path.exists(save_to):
+        fp = open(save_to, 'a')
+        for case in case_list:
+            wrt_str = ""
+            f_list = glob.glob(os.path.join(data_root, case, "*"+ext))
+            if random_sample < 1:  # random number is percentage
+                random_sample = int(random_sample * len(f_list))
+            elif random_sample > len(f_list):
+                print("warning! Can't get %d samples in this case" % random_sample)
+                random_sample = len(f_list)
+            f_list = random.sample(f_list, random_sample)
+            label = "0"
+            for key, value in class_maps.items():
+                if case in value:
+                    label = str(key)
+                    break
+            for f in f_list:
+                wrt_str += label + "," + f + "\n"
+            fp.write(wrt_str)
+        fp.close()
+    else:
+        print("file has already exists")
+
 
 def list_all_img_names(data_root, case_list, ext=".jpg"):
     all_f_list = []
@@ -72,7 +111,11 @@ def patch_data_label_generator(data_list_txt, batch_size, mode="train", aug=None
                     break
             line = line.strip().split(",")
             label = int(line[0])
-            image = np.array(Image.open(line[1], 'r'))
+            if label == 0:
+                label = [0, 1]
+            else:
+                label = [1, 0]
+            image = np.array(Image.open(line[1], 'r')).astype(np.float32) / 255.0
             images.append(image)
             labels.append(label)
         if aug is not None:
@@ -107,9 +150,7 @@ if __name__ == "__main__":
 
     class_maps = {0: borderline_case_id_list, 1: high_grade_case_id_list}
 
-    data_train_txt = os.path.join(patch_root, "training.txt")
-    data_validate_txt = os.path.join(patch_root, "validation.txt")
-    data_test_txt = os.path.join(patch_root, "testing.txt")
+
 
     '''
     Test 1:
@@ -121,10 +162,22 @@ if __name__ == "__main__":
     '''
     Test 2:
     '''
+    data_train_txt = os.path.join(patch_root, "training.txt")
+    data_validate_txt = os.path.join(patch_root, "validation.txt")
+    data_test_txt = os.path.join(patch_root, "testing.txt")
     save_all_img_names_and_labels(data_train_txt, patch_root, borderline_train+high_grade_train, class_maps)
     save_all_img_names_and_labels(data_validate_txt, patch_root, borderline_validate + high_grade_validate, class_maps)
     save_all_img_names_and_labels(data_test_txt, patch_root, borderline_test + high_grade_test, class_maps)
 
+    '''
+    save_random_img_names_and_labels_per_case
+    '''
+    # data_train_txt = os.path.join(patch_root, "training_sampled.txt")
+    # data_validate_txt = os.path.join(patch_root, "validation_sampled.txt")
+    # data_test_txt = os.path.join(patch_root, "testing_sampled.txt")
+    # save_random_img_names_and_labels_per_case(data_train_txt, patch_root, borderline_train+high_grade_train, class_maps)
+    # save_random_img_names_and_labels_per_case(data_validate_txt, patch_root, borderline_validate + high_grade_validate, class_maps)
+    # save_random_img_names_and_labels_per_case(data_test_txt, patch_root, borderline_test + high_grade_test, class_maps)
 
     # test function
     '''

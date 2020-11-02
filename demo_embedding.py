@@ -17,17 +17,12 @@ if __name__ == '__main__':
     # A: restore the encoder
     model = create_encoder()
     model_AE = create_model()
-    AE_layers = [l for l in model_AE.layers]
-    # new_layers = [l for l in model.layers]
-    # k = model.layers
+    # AE_layers = [l for l in model_AE.layers]
     for i in range(len(model.layers)):
-        old_layer = AE_layers[i]
+        # old_layer = AE_layers[i]
         # new_layer = new_layers[i]
-        model.layers[i].set_weights(old_layer.get_weights())
+        model.layers[i].set_weights(model_AE.layers[i].get_weights())
 
-    # B: restore the entire model
-    model = create_model()
-    model.load_weights(model_weights_path)
     print(model.summary())
 
     test_type_list = ["Borderline", "HighGrade"]
@@ -60,18 +55,17 @@ if __name__ == '__main__':
             rgb_img = cv.cvtColor(bgr_img, cv.COLOR_BGR2RGB)
             rgb_img = rgb_img / 255.0
             x_test[0, :, :, :] = rgb_img
-            out = model.predict(x_test)
-            embedding = model.get_layer("deconv_7").input
+            embedding = model.predict(x_test)
 
-            with tf.Session() as sess:
-                x_value = sess.run(embedding)
-                print(x_value)
-                write_to = os.path.join("/infodev1/non-phi-data/junjiang/Autoencoder_plus/data_log", "temp.npy")
-                np.save(write_to, x_value, allow_pickle=False)
+            # with tf.Session() as sess:
+            #     x_value = sess.run(embedding)
+            #     print(x_value)
+            #     write_to = os.path.join("/infodev1/non-phi-data/junjiang/Autoencoder_plus/data_log", "temp.npy")
+            #     np.save(write_to, x_value, allow_pickle=False)
 
             # tf.io.write_file(write_to, embedding, "embedding")
             # print(out.shape)
-            out = np.squeeze(out)
+            out = np.squeeze(embedding.flatten())
             # out = np.reshape(out, (img_rows, img_cols))
             out = out * 255.0
 
