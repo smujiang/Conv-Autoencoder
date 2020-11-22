@@ -5,6 +5,7 @@ from keras.layers import Conv2D, ZeroPadding2D, MaxPooling2D
 from keras.layers import Dense, Dropout, Flatten, Input
 from keras.models import Sequential, Model
 
+
 def vgg16_updated():
     # Encoder
     input_tensor = Input(shape=(256, 256, 3))

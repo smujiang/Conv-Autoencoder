@@ -7,7 +7,7 @@ from sklearn.linear_model import LassoCV, LassoLarsCV, LassoLarsIC
 from sklearn import datasets
 
 # This is to avoid division by zero while doing np.log10
-EPSILON = 1e-4
+EPSILON = 1e-6
 
 # X, y = datasets.load_diabetes(return_X_y=True)
 #
@@ -72,7 +72,7 @@ plt.title('Information-criterion for model selection (training time %.3fs)'
 # Compute paths
 print("Computing regularization path using the coordinate descent lasso...")
 t1 = time.time()
-model = LassoCV(cv=20).fit(patch_features_data, patch_labels)
+model = LassoCV(cv=20, normalize=True).fit(patch_features_data, patch_labels)
 t_lasso_cv = time.time() - t1
 
 # Display results
