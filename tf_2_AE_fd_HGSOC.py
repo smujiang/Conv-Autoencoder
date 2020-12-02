@@ -8,6 +8,14 @@ from tensorflow.python.keras.layers import VersionAwareLayers
 from tensorflow.python.keras import backend
 layers = VersionAwareLayers()
 
+import pandas as pd
+import numpy as np
+
+num_classes = 2
+batch_sz = 32
+IMG_SIZE = 256
+IMG_SHAPE = (IMG_SIZE, IMG_SIZE, 3)
+
 # encoder from VGG16 layers
 def encoder(input_tensor=None, input_shape=None):
     if input_tensor is None:
@@ -245,7 +253,56 @@ def create_model():
     model = Model(inputs=input_tensor, outputs=x)
     return model
 
-checkpoint_dir = ""
+def label_to_int(labels_list, class_index):  # labels is a list of labels
+    int_classes = []
+    for label in labels_list:
+        int_classes.append(class_index.index(label))  # the class_index.index() looks values up in the list label
+    int_classes = np.array(int_classes, dtype=np.int32)
+    return int_classes, class_index  # returning class index so you know what things are
 
-last_ckp = tf.train.latest_checkpoint(checkpoint_dir, latest_filename=None)
+def decode_example_fd(filename, label):
+    image_string = tf.io.read_file(filename)
+    image_decoded = tf.image.decode_jpeg(image_string, channels=3)
+    image = tf.cast(image_decoded, tf.float32) / 255.
+    image = tf.reshape(image, IMG_SHAPE)
+    label = tf.cast(tf.one_hot(label, num_classes), tf.int64)
+    return image, label
+
+
+def WSI_data_generator_fd(file_list, label_list, batch_size):
+    dataset = tf.data.Dataset.from_tensor_slices((file_list, label_list))
+    dataset = dataset.map(decode_example_fd)
+    dataset = dataset.repeat()
+    dataset = dataset.batch(batch_size)
+    return dataset
+
+
+if __name__ == "__main__":
+    label_names = ["SBOT", "HGSOC"]
+
+    training_save_to = "/infodev1/non-phi-data/junjiang/OvaryCancer/AutoEncoder_Result/training_tf.csv"
+    train_cnt = len(open(training_save_to, "r").readlines())
+    header = "split,image_url,label\n"
+    names = header.strip().split(",")
+
+    # create dataset
+    train_df = pd.read_csv(training_save_to, names=names)
+    train_file_list = train_df[names[1]].tolist()[1:]
+    train_label_txt_list = train_df[names[2]].tolist()[1:]
+    train_label_list, _ = label_to_int(train_label_txt_list, label_names)
+    train_ds = WSI_data_generator_fd(train_file_list, train_label_list, batch_size=batch_sz)
+
+    # Create the model
+
+    # load the previous model if available
+    checkpoint_dir = ""
+    last_ckp_fn = tf.train.latest_checkpoint(checkpoint_dir, latest_filename=None)
+    if last_ckp_fn is not None:
+        # TODO: load the last check point
+        print("TODO")
+
+    # train the model
+
+
+
 
