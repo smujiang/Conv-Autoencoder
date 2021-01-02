@@ -23,9 +23,9 @@ if __name__ == '__main__':
     all_model_list = ["Fibrosis_25-0.1366.hdf5", "Cellularity_18-0.1784.hdf5", "Orientation_27-0.2193.hdf5"]
 
     # Load our data
-    patch_root = "/infodev1/non-phi-data/junjiang/OvaryCancer/StromaReaction/PatchSampling"
+    patch_root = "/infodev1/non-phi-data/junjiang/OvaryCancer/StromaReaction/Testing_ROI_Patches"
     WSI_root = "/infodev1/non-phi-data/junjiang/OvaryCancer/StromaReaction/WSIs"
-    output_dir = "/infodev1/non-phi-data/junjiang/OvaryCancer/StromaReaction/VGG16_Classification_ROIs"
+    output_dir = "/infodev1/non-phi-data/junjiang/OvaryCancer/StromaReaction/VGG16_Classification_ROIs_validation"
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
@@ -33,8 +33,11 @@ if __name__ == '__main__':
     #                  "Wo-3-B5_RIO1338_HE", "Wo-3-C1_RIO1338_HE", "Wo-4-A9_RIO1338_HE",
     #                  "Wo-4-B1_RIO1338_HE"]
 
-    testing_cases = ["Wo-1-A5_RIO1338_HE", "Wo-1-C4_RIO1338_HE", "Wo-1-F1_RIO1338_HE", "Wo-2-B4_RIO1338_HE", "Wo-2-F1_RIO1338_HE"]
-
+    # testing_cases = ["Wo-1-A5_RIO1338_HE", "Wo-1-C4_RIO1338_HE", "Wo-1-F1_RIO1338_HE", "Wo-2-B4_RIO1338_HE", "Wo-2-F1_RIO1338_HE"]
+    testing_cases = ["Wo-1-A5_RIO1338_HE", "Wo-1-C4_RIO1338_HE", "Wo-1-F1_RIO1338_HE",
+                 "Wo-2-B4_RIO1338_HE", "Wo-2-F1_RIO1338_HE",
+                 "Wo-2-F5_RIO1338_HE", "Wo-2-L1_RIO1338_HE", "Wo-2-N1_RIO1338_HE",
+                 "Wo-3-B5_RIO1338_HE", "Wo-3-C1_RIO1338_HE"]
     # Load our model
     model_weights_path = '/infodev1/non-phi-data/junjiang/OvaryCancer/StromaReaction/model'
     VGG16_MODEL = VGG16(include_top=True, weights=None, input_tensor=None, input_shape=IMG_SHAPE,
