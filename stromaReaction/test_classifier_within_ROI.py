@@ -20,12 +20,13 @@ if __name__ == '__main__':
     num_classes = 3
 
     all_class_list = ["Fibrosis", "Cellularity", "Orientation"]
-    all_model_list = ["Fibrosis_25-0.1366.hdf5", "Cellularity_18-0.1784.hdf5", "Orientation_27-0.2193.hdf5"]
+    # all_model_list = ["Fibrosis_25-0.1366.hdf5", "Cellularity_18-0.1784.hdf5", "Orientation_27-0.2193.hdf5"]
+    all_model_list = ["Fibrosis_10-0.1976.hdf5", "Cellularity_16-0.0911.hdf5", "Orientation_06-0.1932.hdf5"]
 
     # Load our data
     patch_root = "/infodev1/non-phi-data/junjiang/OvaryCancer/StromaReaction/Testing_ROI_Patches"
     WSI_root = "/infodev1/non-phi-data/junjiang/OvaryCancer/StromaReaction/WSIs"
-    output_dir = "/infodev1/non-phi-data/junjiang/OvaryCancer/StromaReaction/VGG16_Classification_ROIs_validation"
+    output_dir = "/infodev1/non-phi-data/junjiang/OvaryCancer/StromaReaction/VGG16_Classification_ROIs_validation_with_aug"
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 

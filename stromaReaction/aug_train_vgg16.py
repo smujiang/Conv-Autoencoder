@@ -86,10 +86,23 @@ class WSI_data_generator():
         if "color_variations" in augment_opt:
             self.color_variations = True
 
+# Too time consuming, 4 epochs in 18 hours
+    '''
+    2021-01-04 09:14:46.700131: W tensorflow/core/framework/cpu_allocator_impl.cc:81] Allocation of 536870912 exceeds 10% of free system memory.
+    280/280 [==============================] - 16217s 58s/step - loss: 0.6063 - accuracy: 0.4949 - val_loss: 0.5997 - val_accuracy: 0.5063
+    Epoch 3/200
+    280/280 [==============================] - ETA: 0s - loss: 0.6058 - accuracy: 0.4955 
+    Epoch 00003: val_loss improved from 0.59967 to 0.59848, saving model to /infodev1/non-phi-data/junjiang/OvaryCancer/StromaReaction/model/Fibrosis/Fibrosis_03-0.5985.hdf5
+    280/280 [==============================] - 16213s 58s/step - loss: 0.6058 - accuracy: 0.4955 - val_loss: 0.5985 - val_accuracy: 0.5063
+    Epoch 4/200
+    280/280 [==============================] - ETA: 0s - loss: 0.6051 - accuracy: 0.4945 
+    '''
     def stain_augmentation(self, image):
         to_augment = staintools.LuminosityStandardizer.standardize(image)
         self.stain_augmentor.fit(to_augment)
         return self.stain_augmentor.pop().astype(np.uint8)
+
+
 
     def decode_example(self, filename, label):
         image_string = tf.io.read_file(filename)
@@ -108,10 +121,10 @@ class WSI_data_generator():
         if self.flip_up_down:
             image = tf.image.random_flip_up_down(image)
         if self.color_variations:
-            image = tf.image.random_saturation(image, lower=0.5, upper=1.5)
-            image = tf.image.random_brightness(image, max_delta=32./ 255.)
-            image = tf.image.random_contrast(image, lower=0.5, upper=1.5)
-            image = tf.image.random_hue(image, max_delta=0.2)
+            image = tf.image.random_saturation(image, lower=0.2, upper=1.2)
+            # image = tf.image.random_brightness(image, max_delta=32./ 255.)
+            # image = tf.image.random_contrast(image, lower=0.5, upper=1.5)
+            image = tf.image.random_hue(image, max_delta=0.1)
 
         image = tf.cast(image, tf.float32) / 255.
         label = tf.cast(tf.one_hot(label, num_classes), tf.int64)
@@ -125,7 +138,7 @@ class WSI_data_generator():
         return dataset
 
 
-epochs = 30
+epochs = 200
 patience = 2
 bs = 32
 trained_models_path = "/infodev1/non-phi-data/junjiang/OvaryCancer/StromaReaction/model"
@@ -136,8 +149,8 @@ VGG16_MODEL = VGG16(include_top=True, weights=None, input_tensor=None, input_sha
 
 
 # augment_opt = ["stain_variations"]
-# augment_opt = ["flip_up_down", "flip_left_right", "stain_variations"]
-augment_opt = ["flip_up_down", "flip_left_right", "color_variations"]
+augment_opt = ["flip_up_down", "flip_left_right", "stain_variations"]
+# augment_opt = ["flip_up_down", "flip_left_right", "color_variations"]
 # augment_opt = ["flip_up_down", "flip_left_right"]
 
 print(tf.__version__)
@@ -159,10 +172,23 @@ for m in all_label_list:
     model_checkpoint = ModelCheckpoint(model_names, monitor='val_loss', verbose=1, save_best_only=True)
 
     early_stop = EarlyStopping('val_loss', patience=patience)
-    reduce_lr = ReduceLROnPlateau('val_loss', factor=0.1, patience=int(patience / 4), verbose=1)
+    # Note: Before Data Augmentation
+    # reduce_lr = ReduceLROnPlateau('val_loss', factor=0.1, patience=int(patience / 4), verbose=1)
+    # Note:
+    reduce_lr = ReduceLROnPlateau('val_loss', factor=0.1, patience=patience, verbose=1)
     callbacks = [tensor_board, model_checkpoint, early_stop, reduce_lr]
 
+    # Note: Before Data Augmentation
     VGG16_MODEL.compile(loss='binary_crossentropy', optimizer=tf.keras.optimizers.Adam(lr=1e-5), metrics=['accuracy'], run_eagerly=True)
+    # Note:
+    # VGG16_MODEL.compile(loss='binary_crossentropy', optimizer=tf.keras.optimizers.Adam(lr=1e-6), metrics=['accuracy'], run_eagerly=True)
+    # 1e-4: loss: 0.6062 - accuracy: 0.4959 - val_loss: 0.6020 - val_accuracy: 0.5054
+    #  loss: 0.6339 - accuracy: 0.3834 - val_loss: 0.6338 - val_accuracy: 0.3848
+    #  loss: 0.6070 - accuracy: 0.4333 - val_loss: 0.6086 - val_accuracy: 0.4205
+    # 1e-6:
+    # loss: 0.5094 - accuracy: 0.5494 - val_loss: 0.5065 - val_accuracy: 0.5487
+    # loss: 0.5053 - accuracy: 0.5913 - val_loss: 0.5210 - val_accuracy: 0.5951
+    # loss: 0.5478 - accuracy: 0.5670 - val_loss: 0.5485 - val_accuracy: 0.5647
 
     train_scores_list = pd.Series.get(train_df, m).tolist()
     val_scores_list = pd.Series.get(val_df, m).tolist()

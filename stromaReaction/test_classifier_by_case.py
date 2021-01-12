@@ -19,7 +19,8 @@ if __name__ == '__main__':
     num_classes = 3
 
     all_class_list = ["Fibrosis", "Cellularity", "Orientation"]
-    all_model_list = ["Fibrosis_25-0.1366.hdf5", "Cellularity_18-0.1784.hdf5", "Orientation_27-0.2193.hdf5"]
+    # all_model_list = ["Fibrosis_25-0.1366.hdf5", "Cellularity_18-0.1784.hdf5", "Orientation_27-0.2193.hdf5"]
+    all_model_list = ["Fibrosis_10-0.1976.hdf5", "Cellularity_16-0.0911.hdf5", "Orientation_06-0.1932.hdf5"]
 
     # Load our data
     patch_root = "/infodev1/non-phi-data/junjiang/OvaryCancer/StromaReaction/WSIs_patches_256"
@@ -62,12 +63,13 @@ if __name__ == '__main__':
                 out = VGG16_MODEL.predict(test_x)
                 # get score for heat-map
                 # TODO: calculate score from three probability
-                # max_val = max(out[0])
-                # max_idx = list(out[0]).index(max_val)
-                score = 0
-                for val_idx, val in enumerate(out[0]):
-                    score += val_idx * val
-                score_list.append(score)
+                max_val = max(out[0])
+                max_idx = list(out[0]).index(max_val)
+                score_list.append(max_idx)
+                # score = 0
+                # for val_idx, val in enumerate(out[0]):
+                #     score += val_idx * val
+                # score_list.append(score)
 
                 # get locations from image file name
                 img_fn = os.path.split(f)[1]
